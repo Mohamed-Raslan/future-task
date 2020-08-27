@@ -4,13 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.app.product.fullproduct.entities.ProductEntity;
+import com.app.product.fullproduct.pojo.ProductRequest;
 import com.app.product.fullproduct.repository.ProductRepo;
 import com.app.product.fullproduct.services.ProductService;
+
+import ch.qos.logback.core.joran.util.beans.BeanUtil;
 
 @Controller
 @RequestMapping(value = "/product")
@@ -37,29 +47,23 @@ public class ProductController {
 			            @RequestParam(defaultValue = "0") Integer pageNo, 
                         @RequestParam(defaultValue = "4") Integer pageSize) {
 		
-		
-		
-		
 		Pageable paging = PageRequest.of(pageNo, pageSize);
         Page<ProductEntity> pagedResult = repo.findAll(paging);
         if(pagedResult.hasContent()) {
-            model.addAttribute("products",pagedResult.getContent());
-            model.addAttribute("totalNumber",pagedResult.getTotalPages());
+               model.addAttribute("products",pagedResult.getContent());
+               model.addAttribute("totalNumber",pagedResult.getTotalPages());
+               model.addAttribute("pageNo",pageNo);
             return "home";
-            
-            
+                       
         } else {
         	model.addAttribute("products" , new ArrayList<ProductEntity>());
         	model.addAttribute("totalNumber",pagedResult.getTotalPages());
             return "home" ;
         }
-		
-        
-		
 				 
 //		List<ProductEntity> products = productService.findAll(pageNo, pageSize);
 //		model.addAttribute("products" , products);
-//		model.addAttribute("arraySize" , products.size());
+//        model.addAttribute("pageNo",pageNo);
 //		return "home";
 		
 	}
@@ -91,7 +95,10 @@ public class ProductController {
 		
 		// get details of product to update this product
 		ProductEntity productEntity = productService.getProductbyId(id);
-		model.addAttribute("newproductafterupdate" , productEntity);
+		ProductRequest request      = new ProductRequest();
+		BeanUtils.copyProperties(productEntity, request);
+		
+		model.addAttribute("newproductafterupdate" , request);
 		return "editpage";
 				
 	}
@@ -110,7 +117,7 @@ public class ProductController {
 	@GetMapping(value = "/pageofadding")
 	public String addProductPage(Model model) {
 		
-		model.addAttribute("productmodel",new ProductEntity());
+		model.addAttribute("productmodel", new ProductRequest());
 		return "addpage";
 		
 	}
@@ -118,12 +125,15 @@ public class ProductController {
 	
 	
 	@PostMapping(value = "/addproduct")
-	public String addProductPage(@ModelAttribute ProductEntity product) {
+	public String addProductPage(@Valid @ModelAttribute("productmodel") ProductRequest product , BindingResult result) {
 		
-		// we will save product on Mysql 
+		if(result.hasErrors())
+			return "addpage";
 		
 		try {
-			productService.saveOrUpdateProduct(product);
+			ProductEntity productEntity = new ProductEntity();
+			BeanUtils.copyProperties(product, productEntity);
+			productService.saveOrUpdateProduct(productEntity);
 			return "redirect:http://localhost:8080/product";
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -148,10 +158,16 @@ public class ProductController {
 	}
 	
 	@RequestMapping(value = "/doneedited" , method = {RequestMethod.PUT , RequestMethod.GET})
-	public String updateProduct(@ModelAttribute("newproductafterupdate") ProductEntity product) {
+	public String updateProduct(@Valid @ModelAttribute("newproductafterupdate") ProductRequest request , BindingResult result) {
 		
 		// we will save product on Mysql 
+		
+		if(result.hasErrors())
+			return "editpage";
+		
 		try {
+			ProductEntity product = new ProductEntity();
+			BeanUtils.copyProperties(request, product);
 			productService.saveOrUpdateProduct(product);
 			return "redirect:http://localhost:8080/product";
 		} catch (Exception e) {
@@ -163,6 +179,14 @@ public class ProductController {
 		}
 		
 	}
+	
+
+	    @InitBinder
+	    public void initBinder ( WebDataBinder binder )
+	    {
+	        StringTrimmerEditor stringtrimmer = new StringTrimmerEditor(true);
+	        binder.registerCustomEditor(String.class, stringtrimmer);
+	    }
 	
 	
 	

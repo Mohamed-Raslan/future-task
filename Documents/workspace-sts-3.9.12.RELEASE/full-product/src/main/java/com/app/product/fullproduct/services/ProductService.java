@@ -25,6 +25,7 @@ public class ProductService {
 	
 	
 	public List<ProductEntity> findAll(Integer pageNo ,Integer pageSize ){
+		
 		Pageable paging = PageRequest.of(pageNo, pageSize);
         Page<ProductEntity> pagedResult = repo.findAll(paging);
         

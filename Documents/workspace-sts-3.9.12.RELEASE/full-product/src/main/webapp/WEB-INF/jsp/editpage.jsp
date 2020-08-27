@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=windows-1256"
-	pageEncoding="windows-1256"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,6 +7,15 @@
 <title>adding page</title>
 <link rel="stylesheet"
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	
+	
+	<style type="text/css">
+	
+	.error {color : red}
+	
+	</style>
+	
+	
 </head>
 <body>
 
@@ -34,13 +43,16 @@
 				<label for="inputAddress">Name</label>
 				<form:input type="text" class="form-control"
 					path="name" placeholder="Name of Product" value = "${newproductafterupdate.name}"/>
+					
+					<form:errors path="name" cssClass="error" />
 			</div>
 
 			<div class="form-group">
 				<label for="inputAddress2">Description</label>
 				<form:input type="text" class="form-control"
-					path="description" value = "${newproductafterupdate.description}"
+					path="description" value = "${newproductafterupdate.description}" 
 					placeholder="description of Product" />
+					<form:errors path="name" cssClass="error" />
 			</div>
 
 			<button type="submit" class="btn btn-primary">Are you Sure For Update ?</button>
