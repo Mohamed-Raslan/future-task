@@ -78,13 +78,14 @@ public class ProductController {
 	
 	
 	@GetMapping(value = "/productbyname")
-	public String searchByName(Model model , HttpServletRequest request) {
-		String name = request.getParameter("Search");		
-		List<ProductEntity> products =  productService.findByName(name);
-		
+	public String searchByName( Model model , HttpServletRequest request,
+			@RequestParam(defaultValue = "1") Integer totalNumber)
+             {
+	
+		List<ProductEntity> products =  productService.findByName(request.getParameter("Search").trim());
 		if(products.isEmpty())
 			return "nofoundpage";
-		
+		model.addAttribute("totalNumber",totalNumber);
 		model.addAttribute("products" , products);
 		return "home";
 	}

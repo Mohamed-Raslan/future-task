@@ -2,7 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>
+<html >
 <head>
 
 <title>Home Page</title>
@@ -27,7 +27,7 @@
 	<div class="container">
 
 
-<div class="p-3 mb-2 bg-success text-white">  سبحان الخالق الذي رزقنا بأنواع متعدده من الخضروات لا تعد ولا تحصي عنيه بالفيتامينات والالياف المعدنيه الضروريه لنو الجسم والحفاظ علي صحته وهذه قائمه منها</div>
+<div dir="Rtl" class="p-3 mb-2 bg-success text-white">  سبحان الخالق الذي رزقنا بأنواع متعدده من الخضروات لا تعد ولا تحصي عنيه بالفيتامينات والالياف المعدنيه الضروريه لنو الجسم والحفاظ علي صحته وهذه قائمه منها</div>
 
 
 			<!--	<ul class="list-group list-group-horizontal-sm">
@@ -38,28 +38,6 @@
 					<li class="list-group-item">Page Number</li>
 					<li class="list-group-item">${pageNo}</li>
 				</ul> -->
-
-		<nav aria-label="Page navigation example">
-			<ul class="pagination">
-
-
-
-				<c:set var="PN" value="${pageNo}" />
-				<c:choose>
-					<c:when test="${PN > 0}">
-					<li class="page-item"><a class="page-link" href="/product?pageNo=${pageNo-1}"
-					                                  >Previous</a></li>
-					</c:when>
-				</c:choose>
-
-				<li class="page-item"><a class="page-link" href="/product?pageNo=${1}">1</a></li>
-				<li class="page-item"><a class="page-link" href="/product?pageNo=${2}">2</a></li>
-				<li class="page-item"><a class="page-link" href="/product?pageNo=${3}">3</a></li>
-				<li class="page-item"><a class="page-link"
-					href="/product?pageNo=${pageNo+1}">Next</a></li>
-
-			</ul>
-		</nav>
 
 
 
@@ -104,9 +82,59 @@
 				</c:forEach>
 			</tbody>
 		</table>
-
+		
+		
+		
+		<div class="row">
+		<div class="col-4">
 		<a href="/product/pageofadding" class="btn btn-secondary btn-sm">
 			Add New Product</a>
+			</div>
+		
+		<div class="col-8">
+		<nav aria-label="Page navigation example">
+			<ul class="pagination">
+
+
+				<c:if test="${pageNo>0}">
+                   <li class="page-item"><a class="page-link" href="/product?pageNo=${pageNo-1}"
+					                      >Previous</a></li>
+				</c:if>
+				
+
+ <c:forEach begin="0" end="${totalNumber-1}" var="page">
+ 
+ <li class="page-item"><a class="page-link" 
+ 
+ 
+ <c:if test="${pageNo==page}">
+ 
+ style="color:red;background-color: #8bd06c;"
+ 
+ </c:if>
+					href="/product?pageNo=${page}">${page+1}</a></li>
+ 
+ 
+ 
+ </c:forEach>
+				
+				
+
+				<c:if test="${pageNo<totalNumber-1}">
+				
+					<li class="page-item"><a class="page-link" 
+					href="/product?pageNo=${pageNo+1}" aria-disabled="true">Next</a></li>
+				
+                </c:if>
+			</ul>
+		</nav>
+		</div>
+		
+		
+		
+		</div>
+
+		
 
 		
 	
